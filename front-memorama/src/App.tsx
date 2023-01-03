@@ -3,11 +3,16 @@ import logo from './logo.svg';
 import './App.css';
 
 import * as THREE from "three";
-import Interface from './Interface';
 
 function App() {
-  let clicked = '0'
-  const bloques = 64
+  let objetos = ['cuadrado', 'circulo', 'cuadrado', 'circulo']
+  let mallas = [
+    { 'nombre': 'cuadrado', 'forma': new THREE.BoxGeometry(0.7, 0.7, 0.7), 'malla': new THREE.MeshPhongMaterial({ color: 0xff0000 }) },
+    { 'nombre': 'circulo', 'forma': new THREE.CircleGeometry(0.4,15), 'malla': new THREE.MeshPhongMaterial({ color: 0xff0000 }) },
+  ]
+  const pareja = { "primero": "-1", "segundo": "-1" }
+  let clicked = '-1'
+  const bloques = 4
   const tamano = Math.ceil(Math.sqrt(bloques))
 
   const scene = new THREE.Scene();
@@ -29,16 +34,32 @@ function App() {
     for (let i = 0; i < tamano; ++i) {
       if (i * tamano + j >= bloques) break;
       let cube = new THREE.Mesh(geometry, material);
-      cube.name = `${i * tamano + j}`
+
+      let indice = i * tamano + j
+      let forma = objetos.splice(Math.floor(Math.random() * objetos.length), 1)[0]
+      let caracteristicas = mallas.find(el => {
+        if (el.nombre === forma)
+          return el
+      })
+      if (caracteristicas === undefined) { console.error("No encontrado"); continue }//TODO: Tirar error
+      const objeto = new THREE.Mesh(caracteristicas.forma, caracteristicas.malla)
+      objeto.position.setX(posInicialX)
+      objeto.position.setY(posInicialY)
+
+      cube.name = `${indice}`
+      cube.userData = { 'forma': forma, 'objeto': objeto }
       cube.position.setX(posInicialX)
       cube.position.setY(posInicialY)
-      scene.add(cube);
-      posInicialX += 1
 
+      cube.visible = false
+      scene.add(cube)
+      scene.add(objeto)
+      posInicialX += 1
     }
     posInicialY += 1
     posInicialX = -tamano / 2.5
   }
+
   camera.position.z = 5;
 
   const colorLuz = 0xffffff;
@@ -54,40 +75,71 @@ function App() {
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
 
-  function onClickObject(event: any) {
+  function render() {
+    raycaster.setFromCamera(pointer, camera);
+    const intersects = raycaster.intersectObjects(scene.children);
+
+    for (let i = 0; i < intersects.length; i++) {
+      if (intersects[i].object.name) {
+        clicked = `${intersects[i].object.name}`
+        if (pareja.primero === "-1") {
+          pareja.primero = intersects[i].object.userData.forma
+        } else {
+          pareja.segundo = intersects[i].object.userData.forma
+        }
+        console.log(pareja)
+        animate()
+        clicked = '-1'
+      }
+    }
+  }
+
+  window.addEventListener('click', (event: any) => {
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     pointer.y = (event.clientY / window.innerHeight) * - 2 + 1;
 
     render()
-  }
-
-  function render() {
-    // update the picking ray with the camera and pointer position
-    raycaster.setFromCamera(pointer, camera);
-    // calculate objects intersecting the picking ray
-    const intersects = raycaster.intersectObjects(scene.children);
-
-    for (let i = 0; i < intersects.length; i++) {
-      console.log(intersects[i].object.name);
-      clicked = intersects[i].object.name;
-    }
-
-    renderer.render(scene, camera);
-  }
-
-  window.addEventListener('click', onClickObject);
-  window.requestAnimationFrame(render);
+  });
 
   let animate = function () {
     requestAnimationFrame(animate);
+
+    scene.children.forEach(el => {
+      if (el.name && el.name === clicked) {
+        el.visible = false
+        el.userData.objeto.visible = true
+        // TODO: Mostrar el elemento nuevo asociado
+      }
+    })
+
+    if (pareja.primero !== "-1" && pareja.segundo !== "-1") {
+      if (pareja.primero !== pareja.segundo) {
+        alert("Perdiste pendejo")
+        console.log("perdiste")
+      }
+      else {
+        console.log("ganaste")
+      }
+      pareja.primero = pareja.segundo = '-1'
+    }
+
     renderer.render(scene, camera);
   };
 
   animate();
 
+  // Esconde los objetos y muestra las casillas
+  setTimeout(() => {
+    scene.children.forEach(element => {
+      if (element.name) {
+        element.visible = true
+        element.userData.objeto.visible = false
+      }
+    });
+  }, 5000)
+
   return (
     <div className="canvas">
-      {/* <Interface clicked={clicked}/> */}
     </div>
   );
 }
