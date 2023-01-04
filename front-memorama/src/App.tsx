@@ -1,65 +1,23 @@
-import React from 'react';
-import logo from './logo.svg';
+// import React from 'react';
+// import logo from './logo.svg';
 import './App.css';
 
 import * as THREE from "three";
+import { GeneradorGrupos } from './utils/generadorParejas';
 
 function App() {
-  let objetos = ['cuadrado', 'circulo', 'cuadrado', 'circulo']
-  let mallas = [
-    { 'nombre': 'cuadrado', 'forma': new THREE.BoxGeometry(0.7, 0.7, 0.7), 'malla': new THREE.MeshPhongMaterial({ color: 0xff0000 }) },
-    { 'nombre': 'circulo', 'forma': new THREE.CircleGeometry(0.4,15), 'malla': new THREE.MeshPhongMaterial({ color: 0xff0000 }) },
-  ]
-  const pareja = { "primero": "-1", "segundo": "-1" }
-  let clicked = '-1'
-  const bloques = 4
-  const tamano = Math.ceil(Math.sqrt(bloques))
-
+  // Escena
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000);
   const renderer = new THREE.WebGLRenderer();
 
-  console.log("Renderizado")
+  const raycaster = new THREE.Raycaster();
+  const pointer = new THREE.Vector2();
+
   renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
+  renderer.setClearColor(0xffffff, 0);
 
-  let geometry = new THREE.BoxGeometry(0.9, 0.9, 0.1);
-  let material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
-
-  let posInicialX = -tamano / 2.5;
-  let posInicialY = -tamano / 2.5;
-
-
-  for (let j = 0; j < tamano; ++j) {
-    for (let i = 0; i < tamano; ++i) {
-      if (i * tamano + j >= bloques) break;
-      let cube = new THREE.Mesh(geometry, material);
-
-      let indice = i * tamano + j
-      let forma = objetos.splice(Math.floor(Math.random() * objetos.length), 1)[0]
-      let caracteristicas = mallas.find(el => {
-        if (el.nombre === forma)
-          return el
-      })
-      if (caracteristicas === undefined) { console.error("No encontrado"); continue }//TODO: Tirar error
-      const objeto = new THREE.Mesh(caracteristicas.forma, caracteristicas.malla)
-      objeto.position.setX(posInicialX)
-      objeto.position.setY(posInicialY)
-
-      cube.name = `${indice}`
-      cube.userData = { 'forma': forma, 'objeto': objeto }
-      cube.position.setX(posInicialX)
-      cube.position.setY(posInicialY)
-
-      cube.visible = false
-      scene.add(cube)
-      scene.add(objeto)
-      posInicialX += 1
-    }
-    posInicialY += 1
-    posInicialX = -tamano / 2.5
-  }
-
+  // Luz
   camera.position.z = 5;
 
   const colorLuz = 0xffffff;
@@ -72,35 +30,79 @@ function App() {
   // const helper = new THREE.PointLightHelper(light)
   // scene.add(helper)
 
-  const raycaster = new THREE.Raycaster();
-  const pointer = new THREE.Vector2();
+  // Inicio de los objetos
+  let clicked = '-1'
+  const grupos = GeneradorGrupos(1)
+  document.body.appendChild(renderer.domElement);
 
-  function render() {
+  if (grupos !== undefined) {
+    console.log("Longitud", grupos.length)
+    const bloques = grupos.length
+    const tamano = Math.ceil(Math.sqrt(bloques))
+
+    let posInicialX = -tamano / 2.5;
+    let posInicialY = -tamano / 2.5;
+
+    const gruposDesordenados = grupos.sort((a, b) => 0.5 - Math.random());
+    let indice = 0
+
+    gruposDesordenados.forEach(element => {
+      let material = new THREE.MeshPhongMaterial({ color: element.color });
+      let forma = element.forma
+
+      // Objeto
+      let objeto = new THREE.Mesh(forma, material)
+      objeto.position.setX(posInicialX)
+      objeto.position.setY(posInicialY)
+      objeto.visible = true
+      scene.add(objeto)
+
+      // Casilla por defecto
+      let casilla = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.1), new THREE.MeshPhongMaterial({ color: 0x00ff00 }));
+      casilla.name = `${indice}`
+      casilla.position.setX(posInicialX)
+      casilla.position.setY(posInicialY)
+      casilla.userData = { 'nombre': element.nombre, 'color': element.color, 'objeto': objeto }
+      casilla.visible = false
+      scene.add(casilla)
+
+      // Aumento de posiciones en la "matriz"
+
+      posInicialX += 1
+      if (indice % tamano === 1) {
+        posInicialY += 1
+        posInicialX = -tamano / 2.5
+      }
+
+      ++indice
+    });
+  }
+
+  // Evento para escuchar los clicks
+  window.addEventListener('click', (event: any) => {
+    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
+    pointer.y = (event.clientY / window.innerHeight) * - 2 + 1;
+
     raycaster.setFromCamera(pointer, camera);
     const intersects = raycaster.intersectObjects(scene.children);
 
     for (let i = 0; i < intersects.length; i++) {
       if (intersects[i].object.name) {
         clicked = `${intersects[i].object.name}`
-        if (pareja.primero === "-1") {
-          pareja.primero = intersects[i].object.userData.forma
-        } else {
-          pareja.segundo = intersects[i].object.userData.forma
-        }
-        console.log(pareja)
+        console.log(clicked)
+        intersects[i].object.visible = false
+        intersects[i].object.userData.objeto.visible = true
+
+        // TODO: Logica para verificar que se ve bien
+
+        // Una vez ha encontrado el objeto clickeado lo renderiza para que se le apliquen los visibles
         animate()
         clicked = '-1'
       }
     }
-  }
-
-  window.addEventListener('click', (event: any) => {
-    pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
-    pointer.y = (event.clientY / window.innerHeight) * - 2 + 1;
-
-    render()
   });
 
+  // Ejecuta el fram sobre la escena
   let animate = function () {
     requestAnimationFrame(animate);
 
@@ -112,22 +114,21 @@ function App() {
       }
     })
 
-    if (pareja.primero !== "-1" && pareja.segundo !== "-1") {
-      if (pareja.primero !== pareja.segundo) {
-        alert("Perdiste pendejo")
-        console.log("perdiste")
-      }
-      else {
-        console.log("ganaste")
-      }
-      pareja.primero = pareja.segundo = '-1'
-    }
+    // if (pareja.primero !== "-1" && pareja.segundo !== "-1") {
+    //   if (pareja.primero !== pareja.segundo) {
+    //     alert("Perdiste pendejo")
+    //     console.log("perdiste")
+    //   }
+    //   else {
+    //     console.log("ganaste")
+    //   }
+    //   pareja.primero = pareja.segundo = '-1'
+    // }
 
     renderer.render(scene, camera);
   };
 
-  animate();
-
+  
   // Esconde los objetos y muestra las casillas
   setTimeout(() => {
     scene.children.forEach(element => {
@@ -137,6 +138,9 @@ function App() {
       }
     });
   }, 5000)
+  
+  // Ejecuta todos los cambios sobre la escena
+  animate();
 
   return (
     <div className="canvas">
