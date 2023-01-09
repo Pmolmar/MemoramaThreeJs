@@ -1,7 +1,3 @@
-// import React from 'react';
-// import logo from './logo.svg';
-import './Juego.css';
-
 import * as THREE from "three";
 import { GeneradorGrupos } from '../../utils/generadorParejas';
 
@@ -13,9 +9,6 @@ function Juego() {
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
-
-  // Frames para movimiento
-  let dxPerFrame = 0.1
 
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0xffffff, 0);

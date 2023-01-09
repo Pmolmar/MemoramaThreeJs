@@ -11,9 +11,7 @@ const root = ReactDOM.createRoot(
 root.render(
   // <React.StrictMode>
   <>
-    <div style={{ position: 'absolute', top: '50%', left: '50%', backgroundColor:'red'}}>
-      <Interfaz />
-    </div>
+    <Interfaz />
     <Juego />
   </>
   // </React.StrictMode>
