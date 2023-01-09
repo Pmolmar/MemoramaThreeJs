@@ -14,6 +14,9 @@ function App() {
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
 
+  // Frames para movimiento
+  let dxPerFrame = 0.1
+
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setClearColor(0xffffff, 0);
 
@@ -32,7 +35,7 @@ function App() {
 
   // Inicio de los objetos
   let clicked = '-1'
-  const grupos = GeneradorGrupos(1)
+  const grupos = GeneradorGrupos(2)
   document.body.appendChild(renderer.domElement);
 
   if (grupos !== undefined) {
@@ -48,12 +51,12 @@ function App() {
 
     gruposDesordenados.forEach(element => {
       let material = new THREE.MeshPhongMaterial({ color: element.color });
-      let forma = element.forma
 
       // Objeto
-      let objeto = new THREE.Mesh(forma, material)
+      let objeto = new THREE.Mesh(element.forma, material)
       objeto.position.setX(posInicialX)
       objeto.position.setY(posInicialY)
+      objeto.userData = { 'movimiento': element.movimiento }
       objeto.visible = true
       scene.add(objeto)
 
@@ -93,10 +96,10 @@ function App() {
         intersects[i].object.visible = false
         intersects[i].object.userData.objeto.visible = true
 
-        // TODO: Logica para verificar que se ve bien
-
         // Una vez ha encontrado el objeto clickeado lo renderiza para que se le apliquen los visibles
         animate()
+
+        // TODO: Logica para verificar que se ha acertado e incrementar nivel
         clicked = '-1'
       }
     }
@@ -107,6 +110,41 @@ function App() {
     requestAnimationFrame(animate);
 
     scene.children.forEach(el => {
+      if (el.userData.movimiento && el.visible) {
+        const movimiento = el.userData.movimiento
+        if (movimiento.tipo === 'rotar') {
+          el.rotateX(movimiento.x)
+          el.rotateY(movimiento.y)
+          el.rotateZ(movimiento.z)
+        }
+        if (movimiento.tipo === 'desplazar') {
+          if (movimiento.x !== 0) {
+            if (movimiento.pos === 0){
+              movimiento.pos = el.position.x
+            }
+            el.position.x += movimiento.x
+            if(el.position.x > movimiento.pos + 0.1) movimiento.x = - movimiento.x
+            if(el.position.x < movimiento.pos - 0.1) movimiento.x = - movimiento.x
+          }
+          if (movimiento.y !== 0) {
+            if (movimiento.pos === 0){
+              movimiento.pos = el.position.y
+            }
+            el.position.y += movimiento.y
+            if(el.position.y > movimiento.pos + 0.1) movimiento.y = - movimiento.y
+            if(el.position.y < movimiento.pos - 0.1) movimiento.y = - movimiento.y
+          }
+          if (movimiento.z !== 0) {
+            if (movimiento.pos === 0){
+              movimiento.pos = el.position.z
+            }
+            el.position.z += movimiento.z
+            if(el.position.z > movimiento.pos + 0.1) movimiento.z = - movimiento.z
+            if(el.position.z < movimiento.pos - 0.1) movimiento.z = - movimiento.z
+          }
+        }
+      }
+
       if (el.name && el.name === clicked) {
         el.visible = false
         el.userData.objeto.visible = true
@@ -128,7 +166,7 @@ function App() {
     renderer.render(scene, camera);
   };
 
-  
+
   // Esconde los objetos y muestra las casillas
   setTimeout(() => {
     scene.children.forEach(element => {
@@ -137,8 +175,8 @@ function App() {
         element.userData.objeto.visible = false
       }
     });
-  }, 5000)
-  
+  }, 2000)
+
   // Ejecuta todos los cambios sobre la escena
   animate();
 
