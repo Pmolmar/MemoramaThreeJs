@@ -25,6 +25,7 @@ const GeneradorObjetos = (nivel: Nivel) => {
 
     const estado = useGameState()
     let combinaciones = new Array<{ nombre: String, color: THREE.ColorRepresentation, forma: THREE.ShapeGeometry, movimiento: { 'tipo': string, 'x': number, 'y': number, 'z': number } }>()
+    let indicesCombinaciones = new Array<{ nombre: String, color: THREE.ColorRepresentation, forma: THREE.ShapeGeometry, movimiento: { 'tipo': string, 'x': number, 'y': number, 'z': number } }>()
 
     const gruposIniciales = nivel.casillaInicio / nivel.numeroMienmbrosGrupo
     console.log("Grupos Iniciales", gruposIniciales)
@@ -36,16 +37,18 @@ const GeneradorObjetos = (nivel: Nivel) => {
         console.log("grupo: ", grupo)
 
         let usado = false
+        // Se podria mejorar con un hashmap y seleccionando posibles elementos por descarte de combinaciones
         while (!usado) {
             let nuevoObjeto = objetosPosibles[Math.floor(Math.random() * objetosPosibles.length)]
             let nuevoColor = coloresPosibles[Math.floor(Math.random() * coloresPosibles.length)]
             let nuevoMovimiento = movimientoPosibles[Math.floor(Math.random() * movimientoPosibles.length)]
 
-            const existe = combinaciones.find(el => el.nombre === nuevoObjeto.nombre && el.color === nuevoColor)
+            const existe = indicesCombinaciones.find(el => el.nombre === nuevoObjeto.nombre && el.color === nuevoColor)
             if (!existe) {
                 for (let repeticiones = 0; repeticiones < nivel.numeroMienmbrosGrupo; ++repeticiones) {
                     combinaciones.push({ nombre: nuevoObjeto.nombre, color: nuevoColor, forma: nuevoObjeto.forma, movimiento: nuevoMovimiento })
                 }
+                indicesCombinaciones.push({ nombre: nuevoObjeto.nombre, color: nuevoColor, forma: nuevoObjeto.forma, movimiento: nuevoMovimiento })
                 usado = true
             }
 

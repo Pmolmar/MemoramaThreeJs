@@ -96,13 +96,13 @@ function App() {
         intersects[i].object.visible = false
         intersects[i].object.userData.objeto.visible = true
 
-        // Una vez ha encontrado el objeto clickeado lo renderiza para que se le apliquen los visibles
-        animate()
 
         // TODO: Logica para verificar que se ha acertado e incrementar nivel
         clicked = '-1'
       }
     }
+    // Una vez ha encontrado el objeto clickeado lo renderiza para que se le apliquen los visibles
+    // animate()
   });
 
   // Ejecuta el fram sobre la escena
@@ -119,28 +119,28 @@ function App() {
         }
         if (movimiento.tipo === 'desplazar') {
           if (movimiento.x !== 0) {
-            if (movimiento.pos === 0){
+            if (movimiento.pos === 0) {
               movimiento.pos = el.position.x
             }
             el.position.x += movimiento.x
-            if(el.position.x > movimiento.pos + 0.1) movimiento.x = - movimiento.x
-            if(el.position.x < movimiento.pos - 0.1) movimiento.x = - movimiento.x
+            if (el.position. x > movimiento.pos + 0.1) movimiento.x = - movimiento.x
+            if (el.position.x < movimiento.pos - 0.1) movimiento.x = - movimiento.x
           }
           if (movimiento.y !== 0) {
-            if (movimiento.pos === 0){
+            if (movimiento.pos === 0) {
               movimiento.pos = el.position.y
             }
             el.position.y += movimiento.y
-            if(el.position.y > movimiento.pos + 0.1) movimiento.y = - movimiento.y
-            if(el.position.y < movimiento.pos - 0.1) movimiento.y = - movimiento.y
+            if (el.position.y > movimiento.pos + 0.1) movimiento.y = - movimiento.y
+            if (el.position.y < movimiento.pos - 0.1) movimiento.y = - movimiento.y
           }
           if (movimiento.z !== 0) {
-            if (movimiento.pos === 0){
+            if (movimiento.pos === 0) {
               movimiento.pos = el.position.z
             }
             el.position.z += movimiento.z
-            if(el.position.z > movimiento.pos + 0.1) movimiento.z = - movimiento.z
-            if(el.position.z < movimiento.pos - 0.1) movimiento.z = - movimiento.z
+            if (el.position.z > movimiento.pos + 0.1) movimiento.z = - movimiento.z
+            if (el.position.z < movimiento.pos - 0.1) movimiento.z = - movimiento.z
           }
         }
       }

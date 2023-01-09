@@ -11,13 +11,13 @@ const nivelFacil: Nivel = {
 }
 
 const nivelMedio: Nivel = {
-    maximoGrupos: 20,
+    maximoGrupos: 10,
     casillaInicio: 8,
     numeroMienmbrosGrupo: 2
 }
 
 const nivelDificil: Nivel = {
-    maximoGrupos: 30,
+    maximoGrupos: 10,
     casillaInicio: 12,
     numeroMienmbrosGrupo: 3
 }
