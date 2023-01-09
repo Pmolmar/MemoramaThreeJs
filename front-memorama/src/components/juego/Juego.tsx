@@ -1,11 +1,11 @@
 // import React from 'react';
 // import logo from './logo.svg';
-import './App.css';
+import './Juego.css';
 
 import * as THREE from "three";
-import { GeneradorGrupos } from './utils/generadorParejas';
+import { GeneradorGrupos } from '../../utils/generadorParejas';
 
-function App() {
+function Juego() {
   // Escena
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -186,4 +186,4 @@ function App() {
   );
 }
 
-export default App;
+export default Juego;

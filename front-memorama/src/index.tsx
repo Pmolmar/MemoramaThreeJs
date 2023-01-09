@@ -1,15 +1,21 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
-import App from './App';
 import reportWebVitals from './reportWebVitals';
+import Juego from './components/juego/Juego';
+import Interfaz from './components/interfaz/Interfaz';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   // <React.StrictMode>
-    <App />
+  <>
+    <div style={{ position: 'absolute', top: '50%', left: '50%', backgroundColor:'red'}}>
+      <Interfaz />
+    </div>
+    <Juego />
+  </>
   // </React.StrictMode>
 );
 
