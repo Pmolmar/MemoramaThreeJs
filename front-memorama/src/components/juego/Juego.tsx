@@ -89,7 +89,6 @@ function Juego() {
         intersects[i].object.visible = false
         intersects[i].object.userData.objeto.visible = true
 
-
         // TODO: Logica para verificar que se ha acertado e incrementar nivel
         clicked = '-1'
       }
@@ -109,31 +108,32 @@ function Juego() {
           el.rotateX(movimiento.x)
           el.rotateY(movimiento.y)
           el.rotateZ(movimiento.z)
-        }
-        if (movimiento.tipo === 'desplazar') {
+        } else if (movimiento.tipo === 'desplazar') {
           if (movimiento.x !== 0) {
             if (movimiento.pos === 0) {
               movimiento.pos = el.position.x
+            } else {
+              el.position.x += movimiento.x
+              // el.position = [0,2,3]
+              if (el.position.x >= (movimiento.pos + 0.1)) movimiento.x = - movimiento.x
+              if (el.position.x <= (movimiento.pos - 0.1)) movimiento.x = - movimiento.x
             }
-            el.position.x += movimiento.x
-            if (el.position. x > movimiento.pos + 0.1) movimiento.x = - movimiento.x
-            if (el.position.x < movimiento.pos - 0.1) movimiento.x = - movimiento.x
-          }
-          if (movimiento.y !== 0) {
+          } else if (movimiento.y !== 0) {
             if (movimiento.pos === 0) {
               movimiento.pos = el.position.y
+            } else {
+              el.position.y += movimiento.y
+              if (el.position.y >= (movimiento.pos + 0.1)) movimiento.y = - movimiento.y
+              if (el.position.y <= (movimiento.pos - 0.1)) movimiento.y = - movimiento.y
             }
-            el.position.y += movimiento.y
-            if (el.position.y > movimiento.pos + 0.1) movimiento.y = - movimiento.y
-            if (el.position.y < movimiento.pos - 0.1) movimiento.y = - movimiento.y
-          }
-          if (movimiento.z !== 0) {
+          } else if (movimiento.z !== 0) {
             if (movimiento.pos === 0) {
               movimiento.pos = el.position.z
+            } else {
+              el.position.z += movimiento.z
+              if (el.position.z >= (movimiento.pos + 0.1)) movimiento.z = - movimiento.z
+              if (el.position.z <= (movimiento.pos - 0.1)) movimiento.z = - movimiento.z
             }
-            el.position.z += movimiento.z
-            if (el.position.z > movimiento.pos + 0.1) movimiento.z = - movimiento.z
-            if (el.position.z < movimiento.pos - 0.1) movimiento.z = - movimiento.z
           }
         }
       }
