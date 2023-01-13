@@ -1,7 +1,9 @@
 import * as THREE from "three";
 import { GeneradorGrupos } from '../../utils/generadorParejas';
+import { useEffect } from "react";
 
-function Juego() {
+
+function Juego( props: {nivel: number, fase: number} ) {
   // Escena
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -21,58 +23,63 @@ function Juego() {
   const light = new THREE.PointLight(colorLuz, intensity);
   light.position.set(0, 0, 2);
 
-  scene.add(light)
-
   // const helper = new THREE.PointLightHelper(light)
   // scene.add(helper)
 
-  // Inicio de los objetos
+  // Inicio de los objetos si tiene estado
   let clicked = '-1'
-  const grupos = GeneradorGrupos(2)
-  document.body.appendChild(renderer.domElement);
+  useEffect(() => {
+    console.log("holiwi", props.nivel)
+    if (props.nivel !== -1) {
+      scene.clear();
+      scene.add(light)
+      const grupos = GeneradorGrupos(props.nivel, props.fase)
+      document.body.appendChild(renderer.domElement);
 
-  if (grupos !== undefined) {
-    console.log("Longitud", grupos.length)
-    const bloques = grupos.length
-    const tamano = Math.ceil(Math.sqrt(bloques))
+      if (grupos !== undefined) {
+        console.log("Longitud", grupos.length)
+        const bloques = grupos.length
+        const tamano = Math.ceil(Math.sqrt(bloques))
 
-    let posInicialX = -tamano / 2.5;
-    let posInicialY = -tamano / 2.5;
+        let posInicialX = -tamano / 2.5;
+        let posInicialY = -tamano / 2.5;
 
-    const gruposDesordenados = grupos.sort((a, b) => 0.5 - Math.random());
-    let indice = 0
+        const gruposDesordenados = grupos.sort((a, b) => 0.5 - Math.random());
+        let indice = 0
 
-    gruposDesordenados.forEach(element => {
-      let material = new THREE.MeshPhongMaterial({ color: element.color });
+        gruposDesordenados.forEach(element => {
+          let material = new THREE.MeshPhongMaterial({ color: element.color });
 
-      // Objeto
-      let objeto = new THREE.Mesh(element.forma, material)
-      objeto.position.setX(posInicialX)
-      objeto.position.setY(posInicialY)
-      objeto.userData = { 'movimiento': element.movimiento }
-      objeto.visible = true
-      scene.add(objeto)
+          // Objeto
+          let objeto = new THREE.Mesh(element.forma, material)
+          objeto.position.setX(posInicialX)
+          objeto.position.setY(posInicialY)
+          objeto.userData = { 'movimiento': element.movimiento }
+          objeto.visible = true
+          scene.add(objeto)
 
-      // Casilla por defecto
-      let casilla = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.1), new THREE.MeshPhongMaterial({ color: 0x00ff00 }));
-      casilla.name = `${indice}`
-      casilla.position.setX(posInicialX)
-      casilla.position.setY(posInicialY)
-      casilla.userData = { 'nombre': element.nombre, 'color': element.color, 'objeto': objeto }
-      casilla.visible = false
-      scene.add(casilla)
+          // Casilla por defecto
+          let casilla = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.1), new THREE.MeshPhongMaterial({ color: 0x00ff00 }));
+          casilla.name = `${indice}`
+          casilla.position.setX(posInicialX)
+          casilla.position.setY(posInicialY)
+          casilla.userData = { 'nombre': element.nombre, 'color': element.color, 'objeto': objeto }
+          casilla.visible = false
+          scene.add(casilla)
 
-      // Aumento de posiciones en la "matriz"
+          // Aumento de posiciones en la "matriz"
 
-      posInicialX += 1
-      if (indice % tamano === 1) {
-        posInicialY += 1
-        posInicialX = -tamano / 2.5
+          posInicialX += 1
+          if (indice % tamano === 1) {
+            posInicialY += 1
+            posInicialX = -tamano / 2.5
+          }
+
+          ++indice
+        });
       }
-
-      ++indice
-    });
-  }
+    }
+  }, [props.nivel, props.fase])
 
   // Evento para escuchar los clicks
   window.addEventListener('click', (event: any) => {
@@ -97,7 +104,8 @@ function Juego() {
     // animate()
   });
 
-  // Ejecuta el fram sobre la escena
+
+  // Ejecuta el frame sobre la escena
   let animate = function () {
     requestAnimationFrame(animate);
 

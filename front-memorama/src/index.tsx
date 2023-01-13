@@ -2,18 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 import reportWebVitals from './reportWebVitals';
-import Juego from './components/juego/Juego';
-import Interfaz from './components/interfaz/Interfaz';
+import { App } from './components/app/app';
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
   // <React.StrictMode>
-  <>
-    <Interfaz />
-    <Juego />
-  </>
+  <App />
   // </React.StrictMode>
 );
 

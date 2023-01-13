@@ -1,15 +1,17 @@
 import React from "react";
 import styles from './Interfaz.module.css';
-import { Paper, Grid, Typography, Modal } from "@mui/material";
-import { useGameState } from "../../hooks/useGameHook";
+import { Paper, Grid, Typography, Modal, Button } from "@mui/material";
 
 // Ponerlo con dialogs para hacer la interfaz
-const Interfaz = () => {
-    const estado = useGameState()
-
+const Interfaz = (props:{setNivel:any}) => {
+    
     const [open, setOpen] = React.useState(true);
     const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const handleClose = (event: any, reason: any) => {
+        if (reason && reason == "backdropClick")
+            return;
+        setOpen(false)
+    };
 
     const style = {
         position: 'absolute' as 'absolute',
@@ -21,22 +23,51 @@ const Interfaz = () => {
         border: '2px solid #000',
         boxShadow: 24,
         p: 4
-      };
+    };
+
+    const setNivelFacil = () => {
+        props.setNivel(0)
+        setOpen(false)
+    }
+    const setNivelMedio = () => {
+        props.setNivel(1)
+        setOpen(false)
+    }
+    const setNivelDificil = () => {
+        props.setNivel(2)
+        setOpen(false)
+    }
 
     return (
         <Modal
             open={open}
+            disableEscapeKeyDown={true}
             onClose={handleClose}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
             <Paper elevation={2} sx={style}>
-                <Typography id="modal-modal-title" variant="h6" component="h2">
-                    Text in a modal
-                </Typography>
-                <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                    Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
-                </Typography>
+                <Grid container textAlign={'center'} gap={1}>
+                    <Grid item xs={12}>
+                        <Typography id="modal-modal-title" variant="h6" component="h2">
+                            Memoraja Three JS
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                            Seleccione nivel para empezar
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Button variant="contained" onClick={setNivelFacil}>Facil</Button>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Button variant="contained" onClick={setNivelMedio}>Medio</Button>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Button variant="contained" onClick={setNivelDificil}>Dificil</Button>
+                    </Grid>
+                </Grid>
             </Paper>
         </Modal>
     )

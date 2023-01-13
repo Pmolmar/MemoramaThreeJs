@@ -1,7 +1,6 @@
 import * as THREE from "three";
 
 import { Nivel, Niveles } from "../types/niveles";
-import { useGameState } from "../hooks/useGameHook";
 
 const objetosPosibles = [
     { 'nombre': 'cuadrado', 'forma': new THREE.BoxGeometry(0.7, 0.7, 0.7) },
@@ -21,15 +20,14 @@ const movimientoPosibles = [
     { 'tipo': 'desplazar', 'x': 0, 'y': 0, 'z': 0.01, 'pos': 0 },
 ]
 
-const GeneradorObjetos = (nivel: Nivel) => {
+const GeneradorObjetos = (nivel: Nivel, fase: number) => {
 
-    const estado = useGameState()
     let combinaciones = new Array<{ nombre: String, color: THREE.ColorRepresentation, forma: THREE.ShapeGeometry, movimiento: { 'tipo': string, 'x': number, 'y': number, 'z': number } }>()
     let indicesCombinaciones = new Array<{ nombre: String, color: THREE.ColorRepresentation, forma: THREE.ShapeGeometry, movimiento: { 'tipo': string, 'x': number, 'y': number, 'z': number } }>()
 
     const gruposIniciales = nivel.casillaInicio / nivel.numeroMienmbrosGrupo
     console.log("Grupos Iniciales", gruposIniciales)
-    const ngrupos = gruposIniciales + estado.fase
+    const ngrupos = gruposIniciales + fase
 
     console.log("Numero total de grupos", ngrupos)
 
@@ -59,17 +57,16 @@ const GeneradorObjetos = (nivel: Nivel) => {
     return combinaciones
 }
 
-export function GeneradorGrupos(nivel: number) {
+export function GeneradorGrupos(nivel: number, fase: number) {
 
     const nivelActual = Niveles.get(nivel);
-    const estado = useGameState()
 
     // TODO: Revisar como funciona la generacion de parejas por niveles y fases
     if (nivelActual === undefined) { console.error("Nivel imposible"); return undefined }
-    const gruposActuales = nivelActual.casillaInicio / nivelActual.numeroMienmbrosGrupo + nivelActual.numeroMienmbrosGrupo * estado.fase
+    const gruposActuales = nivelActual.casillaInicio / nivelActual.numeroMienmbrosGrupo + nivelActual.numeroMienmbrosGrupo * fase
 
     if (gruposActuales < nivelActual.maximoGrupos) {
-        const objetos = GeneradorObjetos(nivelActual)
+        const objetos = GeneradorObjetos(nivelActual, fase)
         return objetos
     }
     else {
