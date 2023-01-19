@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { Elemento } from "../types/elemento";
 
 import { Nivel, Niveles } from "../types/niveles";
 
@@ -9,7 +10,7 @@ const objetosPosibles = [
     { 'nombre': 'anillo', 'forma': new THREE.TorusGeometry(0.3, 0.1, 5, 20) },
     { 'nombre': 'nudo', 'forma': new THREE.TorusKnotGeometry(0.3, 0.1) },
 ]
-const coloresPosibles = [0xff00ff, 0xff0000, 0x0000ff, 0x00ff00, 0x0f0f0f, 0x0f00f0]
+const coloresPosibles = [0x000000, 0xff0000, 0x0000ff, 0x00ff00, 0x00ffff, 0xffff00]
 
 const movimientoPosibles = [
     { 'tipo': 'rotar', 'x': 0.1, 'y': 0, 'z': 0 },
@@ -22,8 +23,8 @@ const movimientoPosibles = [
 
 const GeneradorObjetos = (nivel: Nivel, fase: number) => {
 
-    let combinaciones = new Array<{ nombre: String, color: THREE.ColorRepresentation, forma: THREE.ShapeGeometry, movimiento: { 'tipo': string, 'x': number, 'y': number, 'z': number } }>()
-    let indicesCombinaciones = new Array<{ nombre: String, color: THREE.ColorRepresentation, forma: THREE.ShapeGeometry, movimiento: { 'tipo': string, 'x': number, 'y': number, 'z': number } }>()
+    let combinaciones = new Array<Elemento>()
+    let indicesCombinaciones = new Array<Elemento>()
 
     const gruposIniciales = nivel.casillaInicio / nivel.numeroMienmbrosGrupo
     console.log("Grupos Iniciales", gruposIniciales)
@@ -54,25 +55,25 @@ const GeneradorObjetos = (nivel: Nivel, fase: number) => {
 
     }
 
-    return combinaciones
+    return { indicesCombinaciones, combinaciones }
 }
 
 export function GeneradorGrupos(nivel: number, fase: number) {
 
-    const nivelActual = Niveles.get(nivel);
+    const nivelActual = Niveles[nivel];
 
     // TODO: Revisar como funciona la generacion de parejas por niveles y fases
     if (nivelActual === undefined) { console.error("Nivel imposible"); return undefined }
-    const gruposActuales = nivelActual.casillaInicio / nivelActual.numeroMienmbrosGrupo + nivelActual.numeroMienmbrosGrupo * fase
 
-    if (gruposActuales < nivelActual.maximoGrupos) {
+    if (fase < nivelActual.maximoGrupos) {
         const objetos = GeneradorObjetos(nivelActual, fase)
         return objetos
     }
     else {
         // estado.setFin(true)
         console.log("se ha ganado")
-        return undefined
+        const objetos = GeneradorObjetos(nivelActual, nivelActual.maximoGrupos)
+        return objetos
     }
 
 

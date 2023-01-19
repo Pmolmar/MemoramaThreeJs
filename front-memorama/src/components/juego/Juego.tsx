@@ -1,13 +1,21 @@
 import * as THREE from "three";
 import { GeneradorGrupos } from '../../utils/generadorParejas';
-import { useEffect } from "react";
+import React from "react";
+import { Niveles } from "../../types/niveles";
+import { Elemento } from "../../types/elemento";
 
 
-function Juego( props: {nivel: number, fase: number} ) {
+function Juego(props: { nivel: number, fin: boolean, actualizaFin: any, actualizaPuntos: any }) {
   // Escena
+  let fase = 0
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.2, 1000);
   const renderer = new THREE.WebGLRenderer();
+  const clock = new THREE.Clock();
+  let posibilidades: Array<Elemento>
+  let elegido: Elemento | undefined
+  let objetoElegido: THREE.Mesh | undefined
+  let puntuacion = -1
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -27,24 +35,23 @@ function Juego( props: {nivel: number, fase: number} ) {
   // scene.add(helper)
 
   // Inicio de los objetos si tiene estado
-  let clicked = '-1'
-  useEffect(() => {
-    console.log("holiwi", props.nivel)
+  const inicio = (nivel: number, fase: number) => {
     if (props.nivel !== -1) {
       scene.clear();
       scene.add(light)
-      const grupos = GeneradorGrupos(props.nivel, props.fase)
+      const grupos = GeneradorGrupos(props.nivel, fase)
       document.body.appendChild(renderer.domElement);
 
       if (grupos !== undefined) {
-        console.log("Longitud", grupos.length)
-        const bloques = grupos.length
+        console.log("Longitud", grupos.combinaciones.length)
+        posibilidades = grupos.indicesCombinaciones
+        const bloques = grupos.combinaciones.length
         const tamano = Math.ceil(Math.sqrt(bloques))
 
         let posInicialX = -tamano / 2.5;
         let posInicialY = -tamano / 2.5;
 
-        const gruposDesordenados = grupos.sort((a, b) => 0.5 - Math.random());
+        const gruposDesordenados = grupos.combinaciones.sort((a, b) => 0.5 - Math.random());
         let indice = 0
 
         gruposDesordenados.forEach(element => {
@@ -78,11 +85,23 @@ function Juego( props: {nivel: number, fase: number} ) {
           ++indice
         });
       }
+      // Esconde los objetos y muestra las casillas
+      setTimeout(() => {
+        puntuacion = 0
+        scene.children.forEach(element => {
+          if (element.name) {
+            element.visible = true
+            element.userData.objeto.visible = false
+          }
+        });
+      }, Niveles[props.nivel].tiempo * (fase + 1) * 1000)
     }
-  }, [props.nivel, props.fase])
+  }
 
   // Evento para escuchar los clicks
   window.addEventListener('click', (event: any) => {
+    if (puntuacion < 0) return
+
     pointer.x = (event.clientX / window.innerWidth) * 2 - 1;
     pointer.y = (event.clientY / window.innerHeight) * - 2 + 1;
 
@@ -91,23 +110,55 @@ function Juego( props: {nivel: number, fase: number} ) {
 
     for (let i = 0; i < intersects.length; i++) {
       if (intersects[i].object.name) {
-        clicked = `${intersects[i].object.name}`
-        console.log(clicked)
+
         intersects[i].object.visible = false
         intersects[i].object.userData.objeto.visible = true
 
-        // TODO: Logica para verificar que se ha acertado e incrementar nivel
-        clicked = '-1'
+        if (elegido !== undefined && objetoElegido !== undefined) {
+          if (elegido.nombre === intersects[i].object.userData.nombre &&
+            elegido.color === intersects[i].object.userData.color) {
+            console.log("acierto")
+
+            scene.remove(objetoElegido)
+            elegido = undefined
+
+            puntuacion++
+          } else {
+            console.log("fallo")
+            scene.clear()
+            props.actualizaPuntos(puntuacion)
+            props.actualizaFin(true)
+          }
+        }
+
       }
     }
-    // Una vez ha encontrado el objeto clickeado lo renderiza para que se le apliquen los visibles
-    // animate()
   });
 
 
   // Ejecuta el frame sobre la escena
   let animate = function () {
+    if (scene.children.length === 0 && puntuacion < 0) {
+      inicio(props.nivel, fase)
+    }
+
+    const delta = clock.getElapsedTime()
     requestAnimationFrame(animate);
+
+    if (elegido === undefined && posibilidades !== undefined) {
+      let nuevo = posibilidades.shift()
+      if (nuevo !== undefined) {
+        let material = new THREE.MeshPhongMaterial({ color: nuevo.color });
+        let objeto = new THREE.Mesh(nuevo.forma, material)
+        objeto.position.setX(0)
+        objeto.position.setY(4.4)
+        objeto.userData = { 'movimiento': nuevo.movimiento }
+        objeto.visible = true
+        scene.add(objeto)
+        objetoElegido = objeto
+        elegido = nuevo
+      }
+    }
 
     scene.children.forEach(el => {
       if (el.userData.movimiento && el.visible) {
@@ -117,66 +168,27 @@ function Juego( props: {nivel: number, fase: number} ) {
           el.rotateY(movimiento.y)
           el.rotateZ(movimiento.z)
         } else if (movimiento.tipo === 'desplazar') {
+
+          // obj.position.x = ogX + Math.cos(timestamp)*desp
           if (movimiento.x !== 0) {
-            if (movimiento.pos === 0) {
-              movimiento.pos = el.position.x
-            } else {
-              el.position.x += movimiento.x
-              // el.position = [0,2,3]
-              if (el.position.x >= (movimiento.pos + 0.1)) movimiento.x = - movimiento.x
-              if (el.position.x <= (movimiento.pos - 0.1)) movimiento.x = - movimiento.x
-            }
+            el.position.x = el.position.x + (Math.cos(delta * 4) / 3 * movimiento.x)
           } else if (movimiento.y !== 0) {
-            if (movimiento.pos === 0) {
-              movimiento.pos = el.position.y
-            } else {
-              el.position.y += movimiento.y
-              if (el.position.y >= (movimiento.pos + 0.1)) movimiento.y = - movimiento.y
-              if (el.position.y <= (movimiento.pos - 0.1)) movimiento.y = - movimiento.y
-            }
+            el.position.y = el.position.y + (Math.cos(delta * 4) / 3 * movimiento.y)
           } else if (movimiento.z !== 0) {
-            if (movimiento.pos === 0) {
-              movimiento.pos = el.position.z
-            } else {
-              el.position.z += movimiento.z
-              if (el.position.z >= (movimiento.pos + 0.1)) movimiento.z = - movimiento.z
-              if (el.position.z <= (movimiento.pos - 0.1)) movimiento.z = - movimiento.z
-            }
+            el.position.z = el.position.z + (Math.cos(delta * 4) / 3 * movimiento.z)
           }
         }
       }
 
-      if (el.name && el.name === clicked) {
-        el.visible = false
-        el.userData.objeto.visible = true
-        // TODO: Mostrar el elemento nuevo asociado
-      }
     })
 
-    // if (pareja.primero !== "-1" && pareja.segundo !== "-1") {
-    //   if (pareja.primero !== pareja.segundo) {
-    //     alert("Perdiste pendejo")
-    //     console.log("perdiste")
-    //   }
-    //   else {
-    //     console.log("ganaste")
-    //   }
-    //   pareja.primero = pareja.segundo = '-1'
-    // }
+    if (posibilidades !== undefined && elegido === undefined && posibilidades.length === 0) {
+      console.log("Ganaste")
+      inicio(props.nivel, ++fase)
+    }
 
     renderer.render(scene, camera);
   };
-
-
-  // Esconde los objetos y muestra las casillas
-  setTimeout(() => {
-    scene.children.forEach(element => {
-      if (element.name) {
-        element.visible = true
-        element.userData.objeto.visible = false
-      }
-    });
-  }, 2000)
 
   // Ejecuta todos los cambios sobre la escena
   animate();
@@ -185,6 +197,7 @@ function Juego( props: {nivel: number, fase: number} ) {
     <div className="canvas">
     </div>
   );
+
 }
 
 export default Juego;

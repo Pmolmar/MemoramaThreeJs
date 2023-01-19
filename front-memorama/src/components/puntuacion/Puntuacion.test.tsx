@@ -1,9 +1,9 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import Juego from './Juego';
+import Puntuacion from './Puntuacion';
 
 test('renders learn react link', () => {
-  render(<Juego nivel={0} fin={false} actualizaFin={""} actualizaPuntos={""} />);
+  render(<Puntuacion puntuacion={0}/>);
   const linkElement = screen.getByText(/learn react/i);
   expect(linkElement).toBeInTheDocument();
 });

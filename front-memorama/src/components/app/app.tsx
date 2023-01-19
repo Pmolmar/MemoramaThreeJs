@@ -2,16 +2,21 @@ import React from 'react';
 
 import Juego from '../juego/Juego';
 import Interfaz from '../interfaz/Interfaz';
+import Puntuacion from '../puntuacion/Puntuacion';
 
 export const App = () => {
     const [fin, setFin] = React.useState(false);
-    const [fase, setFase] = React.useState(0);
     const [nivel, setNivel] = React.useState(-1);
+    const [puntos, setPuntos] = React.useState(-1);
 
     return (
         <>
-            <Interfaz setNivel={setNivel}/>
-            {nivel !== -1 && <Juego nivel={nivel} fase={fase} />}
+            <Interfaz setNivel={setNivel} />
+            {fin ?
+                <Puntuacion puntuacion={puntos} />
+                :
+                nivel !== -1 && <Juego nivel={nivel} fin={fin} actualizaFin={setFin} actualizaPuntos={setPuntos} />
+            }
         </>
     )
 }

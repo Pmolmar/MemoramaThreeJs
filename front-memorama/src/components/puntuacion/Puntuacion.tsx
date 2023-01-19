@@ -3,8 +3,8 @@ import React from "react";
 import { Paper, Grid, Typography, Modal, Button } from "@mui/material";
 
 // Ponerlo con dialogs para hacer la interfaz
-const Interfaz = (props:{setNivel:any}) => {
-
+const Puntuacion = (props:{puntuacion:number}) => {
+    
     const [open, setOpen] = React.useState(true);
     // const handleOpen = () => setOpen(true);
     const handleClose = (event: any, reason: any) => {
@@ -25,18 +25,7 @@ const Interfaz = (props:{setNivel:any}) => {
         p: 4
     };
 
-    const setNivelFacil = () => {
-        props.setNivel(0)
-        setOpen(false)
-    }
-    const setNivelMedio = () => {
-        props.setNivel(1)
-        setOpen(false)
-    }
-    const setNivelDificil = () => {
-        props.setNivel(2)
-        setOpen(false)
-    }
+
 
     return (
         <Modal
@@ -55,17 +44,11 @@ const Interfaz = (props:{setNivel:any}) => {
                     </Grid>
                     <Grid item xs={12}>
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                            Seleccione nivel para empezar
+                            Puntuacion final: {props.puntuacion}
                         </Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        <Button variant="contained" onClick={setNivelFacil}>Facil</Button>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Button variant="contained" onClick={setNivelMedio}>Medio</Button>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Button variant="contained" onClick={setNivelDificil}>Dificil</Button>
+                        <Button>Subir puntos</Button>
                     </Grid>
                 </Grid>
             </Paper>
@@ -73,4 +56,4 @@ const Interfaz = (props:{setNivel:any}) => {
     )
 }
 
-export default Interfaz;
+export default Puntuacion;
