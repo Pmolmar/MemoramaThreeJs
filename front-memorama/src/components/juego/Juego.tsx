@@ -36,11 +36,11 @@ function Juego(props: { nivel: Nivel, fin: boolean, actualizaFin: any, actualiza
   // scene.add(helper)
 
   // Inicio de los objetos si tiene estado
-  const inicio = (nivel: Nivel, fase: number) => {
-    if (nivel !== undefined) {
+  const inicio = (fase: number) => {
+    if (props.nivel !== undefined) {
       scene.clear();
       scene.add(light)
-      const grupos = GeneradorGrupos(nivel, fase)
+      const grupos = GeneradorGrupos(props.nivel, fase)
       document.body.appendChild(renderer.domElement);
 
       if (grupos !== undefined) {
@@ -95,7 +95,7 @@ function Juego(props: { nivel: Nivel, fin: boolean, actualizaFin: any, actualiza
             element.userData.objeto.visible = false
           }
         });
-      }, nivel.tiempo * (fase + 1) * 1000)
+      }, props.nivel.tiempo * (fase + 1) * 1000)
     }
   }
 
@@ -144,7 +144,7 @@ function Juego(props: { nivel: Nivel, fin: boolean, actualizaFin: any, actualiza
   // Ejecuta el frame sobre la escena
   let animate = function () {
     if (scene.children.length === 0 && puntuacion < 0) {
-      inicio(props.nivel, fase)
+      inicio(fase)
     }
 
     const delta = clock.getElapsedTime()
@@ -189,7 +189,7 @@ function Juego(props: { nivel: Nivel, fin: boolean, actualizaFin: any, actualiza
 
     if (posibilidades !== undefined && elegido === undefined && posibilidades.length === 0) {
       console.log("Ganaste")
-      inicio(props.nivel, ++fase)
+      inicio(++fase)
     }
 
     renderer.render(scene, camera);
