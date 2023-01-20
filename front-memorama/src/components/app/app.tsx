@@ -3,6 +3,7 @@ import React from 'react';
 import Juego from '../juego/Juego';
 import Interfaz from '../interfaz/Interfaz';
 import Puntuacion from '../puntuacion/Puntuacion';
+import { Niveles } from '../../types/niveles';
 
 export const App = () => {
     const [fin, setFin] = React.useState(false);
@@ -15,7 +16,7 @@ export const App = () => {
             {fin ?
                 <Puntuacion puntuacion={puntos} />
                 :
-                nivel !== -1 && <Juego nivel={nivel} fin={fin} actualizaFin={setFin} actualizaPuntos={setPuntos} />
+                nivel !== -1 && <Juego nivel={Niveles[nivel]} fin={fin} actualizaFin={setFin} actualizaPuntos={setPuntos} />
             }
         </>
     )

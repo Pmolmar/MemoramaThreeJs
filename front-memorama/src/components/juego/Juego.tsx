@@ -1,11 +1,11 @@
 import * as THREE from "three";
 import { GeneradorGrupos } from '../../utils/generadorParejas';
 import React from "react";
-import { Niveles } from "../../types/niveles";
+import { Nivel, Niveles } from "../../types/niveles";
 import { Elemento } from "../../types/elemento";
 
 
-function Juego(props: { nivel: number, fin: boolean, actualizaFin: any, actualizaPuntos: any }) {
+function Juego(props: { nivel: Nivel, fin: boolean, actualizaFin: any, actualizaPuntos: any }) {
   // Escena
   let fase = 0
   const scene = new THREE.Scene();
@@ -36,11 +36,11 @@ function Juego(props: { nivel: number, fin: boolean, actualizaFin: any, actualiz
   // scene.add(helper)
 
   // Inicio de los objetos si tiene estado
-  const inicio = (nivel: number, fase: number) => {
-    if (props.nivel !== -1) {
+  const inicio = (nivel: Nivel, fase: number) => {
+    if (nivel !== undefined) {
       scene.clear();
       scene.add(light)
-      const grupos = GeneradorGrupos(props.nivel, fase)
+      const grupos = GeneradorGrupos(nivel, fase)
       document.body.appendChild(renderer.domElement);
 
       if (grupos !== undefined) {
@@ -95,7 +95,7 @@ function Juego(props: { nivel: number, fin: boolean, actualizaFin: any, actualiz
             element.userData.objeto.visible = false
           }
         });
-      }, Niveles[props.nivel].tiempo * (fase + 1) * 1000)
+      }, nivel.tiempo * (fase + 1) * 1000)
     }
   }
 
@@ -123,7 +123,7 @@ function Juego(props: { nivel: number, fin: boolean, actualizaFin: any, actualiz
             parejas++
             puntuacion++
 
-            if (parejas === Niveles[props.nivel].numeroMienmbrosGrupo) {
+            if (parejas === props.nivel.numeroMienmbrosGrupo) {
               scene.remove(objetoElegido)
               elegido = undefined
             }

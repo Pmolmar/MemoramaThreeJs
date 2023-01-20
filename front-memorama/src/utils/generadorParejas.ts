@@ -58,21 +58,19 @@ const GeneradorObjetos = (nivel: Nivel, fase: number) => {
     return { indicesCombinaciones, combinaciones }
 }
 
-export function GeneradorGrupos(nivel: number, fase: number) {
-
-    const nivelActual = Niveles[nivel];
+export function GeneradorGrupos(nivel: Nivel, fase: number) {
 
     // TODO: Revisar como funciona la generacion de parejas por niveles y fases
-    if (nivelActual === undefined) { console.error("Nivel imposible"); return undefined }
+    if (nivel === undefined) { console.error("Nivel imposible"); return undefined }
 
-    if (fase < nivelActual.maximoGrupos) {
-        const objetos = GeneradorObjetos(nivelActual, fase)
+    if (fase < nivel.maximoGrupos) {
+        const objetos = GeneradorObjetos(nivel, fase)
         return objetos
     }
     else {
         // estado.setFin(true)
         console.log("se ha ganado")
-        const objetos = GeneradorObjetos(nivelActual, nivelActual.maximoGrupos)
+        const objetos = GeneradorObjetos(nivel, nivel.maximoGrupos)
         return objetos
     }
 
