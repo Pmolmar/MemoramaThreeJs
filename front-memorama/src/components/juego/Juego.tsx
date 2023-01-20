@@ -16,6 +16,7 @@ function Juego(props: { nivel: number, fin: boolean, actualizaFin: any, actualiz
   let elegido: Elemento | undefined
   let objetoElegido: THREE.Mesh | undefined
   let puntuacion = -1
+  let parejas = 0
 
   const raycaster = new THREE.Raycaster();
   const pointer = new THREE.Vector2();
@@ -117,12 +118,16 @@ function Juego(props: { nivel: number, fin: boolean, actualizaFin: any, actualiz
         if (elegido !== undefined && objetoElegido !== undefined) {
           if (elegido.nombre === intersects[i].object.userData.nombre &&
             elegido.color === intersects[i].object.userData.color) {
+
             console.log("acierto")
-
-            scene.remove(objetoElegido)
-            elegido = undefined
-
+            parejas++
             puntuacion++
+
+            if (parejas === Niveles[props.nivel].numeroMienmbrosGrupo) {
+              scene.remove(objetoElegido)
+              elegido = undefined
+            }
+
           } else {
             console.log("fallo")
             scene.clear()
