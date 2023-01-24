@@ -1,6 +1,6 @@
 import React from "react";
 // import styles from './Interfaz.module.css';
-import { Paper, Grid, Typography, Modal, Button } from "@mui/material";
+import { Paper, Grid, Typography, Modal, Button, TextField } from "@mui/material";
 
 // Ponerlo con dialogs para hacer la interfaz
 const Puntuacion = (props:{puntuacion:number}) => {
@@ -25,8 +25,6 @@ const Puntuacion = (props:{puntuacion:number}) => {
         p: 4
     };
 
-
-
     return (
         <Modal
             open={open}
@@ -46,6 +44,9 @@ const Puntuacion = (props:{puntuacion:number}) => {
                         <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                             Puntuacion final: {props.puntuacion}
                         </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField></TextField>
                     </Grid>
                     <Grid item xs={12}>
                         <Button>Subir puntos</Button>
