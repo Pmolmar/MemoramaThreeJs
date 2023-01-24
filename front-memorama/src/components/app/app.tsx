@@ -18,7 +18,7 @@ export const App = () => {
         <>
             <Interfaz setNivel={setNivel} />
             {fin ?
-                <Puntuacion puntuacion={puntos} />
+                <Puntuacion puntuacion={puntos} nivel={nivel} />
                 :
                 nivel !== -1 && <Juego nivel={Niveles[nivel]} fin={fin} actualizaFin={setFin} actualizaPuntos={sumaPuntos} />
             }
